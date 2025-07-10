@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Dashboard - MedAssist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet" />
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user_dash.css') }}" />
+</head>
+<body>
+  <div class="user-dashboard">
+    <!-- Top Navigation -->
+    <div class="dashboard-header">
+      <h2>MedAssist User Dashboard</h2>
+      <div class="user-info">
+        <span>👤 {{ user.full_name }}</span>
+        <a class="logout-btn" href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-main">
+      <div class="user-profile-card">
+        <h3>🧾 Profile Details</h3>
+        <ul>
+          <li><strong>Email:</strong> {{ user.email }}</li>
+          <li><strong>Phone:</strong> {{ user.phone }}</li>
+          <li><strong>Landmark:</strong> {{ user.landmark }}</li>
+          <li><strong>Location:</strong> {{ user.location }}</li>
+          <li><strong>Age:</strong> {{ user.age }}</li>
+          <li><strong>Gender:</strong> {{ user.gender }}</li>
+          <li><strong>Registered On:</strong> {{ user.created_at.strftime('%d-%m-%Y %H:%M') }}</li>
+        </ul>
+      </div>
+
+      <div class="health-info-card">
+        <h3>🏥 Health Information</h3>
+        <ul>
+          <li><strong>Medical Conditions:</strong> {{ user.condition or 'None' }}</li>
+          <li><strong>Medications:</strong> {{ user.medications or 'None' }}</li>
+          <li><strong>Allergies:</strong> {{ user.allergies or 'None' }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

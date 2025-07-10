@@ -78,30 +78,34 @@ def dashboard_doctor():
 @app.route('/register-user', methods=['GET', 'POST'])
 def register_user():
     if request.method == 'POST':
-        name = request.form['name']
+        full_name = request.form['full_name']
         email = request.form['email']
+        phone = request.form['phone']
+        landmark = request.form['landmark']
+        location = request.form['location']
         password = request.form['password']
         age = request.form['age']
         gender = request.form['gender']
         condition = request.form['condition']
         medications = request.form['medications']
         allergies = request.form['allergies']
-        user_type = request.form['userType']
 
         if User.query.filter_by(email=email).first():
             flash("Email already registered.", "error")
             return redirect(url_for('register_user'))
 
         user = User(
-            name=name,
+            full_name=full_name,
             email=email,
+            phone=phone,
+            landmark=landmark,
+            location=location,
             password=password,
             age=age,
             gender=gender,
             condition=condition,
             medications=medications,
             allergies=allergies,
-            user_type=user_type,
             created_at=datetime.utcnow()
         )
 
@@ -109,12 +113,29 @@ def register_user():
         db.session.commit()
 
         session['user_id'] = user.id
-        session['user_name'] = user.name
+        session['user_name'] = user.full_name
         session['user_type'] = 'user'
-        flash('User registered successfully!', 'success')
-        return redirect(url_for('home'))
 
-    return render_template('register-user.html')
+        flash("User registered successfully!", "success")
+        return redirect(url_for('dashboard_user'))
+
+    return render_template('user_register.html')
+
+
+@app.route('/dashboard-user')
+def dashboard_user():
+    if 'user_id' not in session or session.get('user_type') != 'user':
+        flash("Unauthorized access. Please login.", "error")
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        flash("User not found!", "error")
+        return redirect(url_for('login'))
+
+    return render_template('dashboard_user.html', user=user)
+
+
 
 # Login Route (for both doctor and user)
 @app.route('/login', methods=['GET', 'POST'])
@@ -135,10 +156,10 @@ def login():
 
         elif user:
             session['user_id'] = user.id
-            session['user_name'] = user.name
+            session['user_name'] = user.full_name
             session['user_type'] = 'user'
-            flash('User logged in successfully!', 'success')
-            return redirect(url_for('home'))
+            flash("User logged in successfully!", "success")
+            return redirect(url_for('dashboard_user'))
 
         else:
             flash('Invalid credentials', 'error')
