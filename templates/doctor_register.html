@@ -18,7 +18,7 @@
           <div class="form-column">
             <h3>👤 Personal Information</h3>
             <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" name="fullName" required />
+            <input type="text" id="fullName" name="full_name" required />
 
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required />
@@ -27,13 +27,18 @@
             <input type="tel" id="phone" name="phone" required />
 
             <label for="password">Password</label>
+            
             <input type="password" id="password" name="password" required />
+
+            <label for="location">Location </label>
+            <input type="text" id="location" name="location" required />
           </div>
+
 
           <div class="form-column">
             <h3>🏥 Professional Information</h3>
             <label for="license">Medical License Number</label>
-            <input type="text" id="license" name="license" required />
+            <input type="text" id="license" name="license_number" required />
 
             <label for="specialization">Specialization</label>
             <input type="text" id="specialization" name="specialization" required />
@@ -41,8 +46,8 @@
             <label for="affiliation">Affiliated Hospital/Clinic</label>
             <input type="text" id="affiliation" name="affiliation" required />
 
-            <label for="certificate">Upload Certificate</label>
-            <input type="file" id="certificate" name="certificate" accept=".pdf,.jpg,.jpeg,.png" required />
+            <!-- <label for="certificate">Upload Certificate</label>
+            <input type="file" id="certificate" name="certificate" accept=".pdf,.jpg,.jpeg,.png" required /> -->
           </div>
         </div>
         <button type="submit" class="submit-btn">Register</button>

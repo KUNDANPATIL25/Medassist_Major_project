@@ -1,43 +1,83 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from werkzeug.utils import secure_filename
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from models import db, User, Doctor
+from flask_sqlalchemy import SQLAlchemy
 import os
+from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"
+app.secret_key = "supersecretkey"  # Use env variables in production
 
-UPLOAD_FOLDER = 'uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Configure SQLite database
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'data.sqlite')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize DB with app
+db.init_app(app)
+
+# Home (Splash / Landing)
 @app.route('/')
 def home():
     return render_template('index.html')
 
+# Doctor Registration
 @app.route('/register-doctor', methods=['GET', 'POST'])
 def register_doctor():
     if request.method == 'POST':
-        name = request.form['fullName']
+        full_name = request.form['full_name']
         email = request.form['email']
         phone = request.form['phone']
         password = request.form['password']
-        license = request.form['license']
-        specialization = request.form['specialization']
+        license_number = request.form['license_number']
+        location = request.form['location']
         affiliation = request.form['affiliation']
-        certificate = request.files['certificate']
+        specialization = request.form['specialization']
 
-        filename = secure_filename(certificate.filename)
-        certificate.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        if Doctor.query.filter_by(email=email).first():
+            flash("Email already registered.", "error")
+            return redirect(url_for('register_doctor'))
 
-        flash('Doctor registered successfully!', 'success')
-        return redirect(url_for('home'))
+        doctor = Doctor(
+            full_name=full_name,
+            email=email,
+            phone=phone,
+            password=password,
+            specialization=specialization,
+            license_number=license_number,
+            location=location,
+            affiliation=affiliation,
+            created_at=datetime.utcnow()
+        )
+
+        db.session.add(doctor)
+        db.session.commit()
+
+        session['user_id'] = doctor.id
+        session['user_name'] = doctor.full_name
+        session['user_type'] = 'doctor'
+        flash("Doctor registered successfully!", "success")
+        return redirect(url_for('dashboard_doctor'))
 
     return render_template('doctor_register.html')
 
+# Doctor Dashboard
+@app.route('/dashboard-doctor')
+def dashboard_doctor():
+    if 'user_id' not in session or session.get('user_type') != 'doctor':
+        flash("Access denied. Please login as a doctor.", "error")
+        return redirect(url_for('login'))
+
+    doctor = Doctor.query.get(session['user_id'])
+    if not doctor:
+        flash("Doctor not found.", "error")
+        return redirect(url_for('login'))
+
+    return render_template('dashboard_doctor.html', doctor=doctor)
+
+# User Registration
 @app.route('/register-user', methods=['GET', 'POST'])
 def register_user():
     if request.method == 'POST':
-        # Capture user form data
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
@@ -48,25 +88,73 @@ def register_user():
         allergies = request.form['allergies']
         user_type = request.form['userType']
 
+        if User.query.filter_by(email=email).first():
+            flash("Email already registered.", "error")
+            return redirect(url_for('register_user'))
+
+        user = User(
+            name=name,
+            email=email,
+            password=password,
+            age=age,
+            gender=gender,
+            condition=condition,
+            medications=medications,
+            allergies=allergies,
+            user_type=user_type,
+            created_at=datetime.utcnow()
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+        session['user_id'] = user.id
+        session['user_name'] = user.name
+        session['user_type'] = 'user'
         flash('User registered successfully!', 'success')
         return redirect(url_for('home'))
 
-    return render_template('user_register.html')
+    return render_template('register-user.html')
 
+# Login Route (for both doctor and user)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
 
-        if email and password:
-            flash('Logged in successfully!', 'success')
+        doctor = Doctor.query.filter_by(email=email, password=password).first()
+        user = User.query.filter_by(email=email, password=password).first()
+
+        if doctor:
+            session['user_id'] = doctor.id
+            session['user_name'] = doctor.full_name
+            session['user_type'] = 'doctor'
+            flash('Doctor logged in successfully!', 'success')
+            return redirect(url_for('dashboard_doctor'))
+
+        elif user:
+            session['user_id'] = user.id
+            session['user_name'] = user.name
+            session['user_type'] = 'user'
+            flash('User logged in successfully!', 'success')
             return redirect(url_for('home'))
+
         else:
             flash('Invalid credentials', 'error')
             return redirect(url_for('login'))
 
     return render_template('login.html')
 
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("Logged out successfully.", "success")
+    return redirect(url_for('home'))
+
+# Run the app
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

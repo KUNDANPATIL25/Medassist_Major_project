@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Registration - MedAssist</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" /> 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/user_styles.css') }}" />
   <script defer src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
 </head>
@@ -18,10 +18,19 @@
           <div class="form-column">
             <h3>👤 Personal Information</h3>
             <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" required />
+            <input type="text" id="name" name="full_name" required />
 
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required />
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required />
+
+            <label for="landmark">Landmark</label>
+            <input type="text" id="landmark" name="landmark" required />
+
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" required />
 
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required />
@@ -49,12 +58,7 @@
             <label for="allergies">Allergies</label>
             <textarea id="allergies" name="allergies"></textarea>
 
-            <label for="userType">User Type</label>
-            <select id="userType" name="userType" required>
-              <option value="">Select Type</option>
-              <option value="Patient">Patient</option>
-              <option value="Learner">Learner</option>
-            </select>
+            
           </div>
         </div>
         <button type="submit" class="submit-btn">Register</button>
