@@ -91,8 +91,8 @@ def register_user():
         allergies = request.form['allergies']
 
         if User.query.filter_by(email=email).first():
-            flash("Email already registered.", "error")
-            return redirect(url_for('register_user'))
+            msg = "Email already registered, Please Login ."
+            return render_template('login.html',message=msg)
 
         user = User(
             full_name=full_name,
@@ -162,8 +162,9 @@ def login():
             return redirect(url_for('dashboard_user'))
 
         else:
-            flash('Invalid credentials', 'error')
-            return redirect(url_for('login'))
+            msq= "Invalid email or password. Please try again."
+            return render_template('login.html', message=msq)
+            
 
     return render_template('login.html')
 

@@ -1,5 +1,16 @@
 /* login_styles.css - Professional Login Styling */
 
+.custom-message {
+  align-self: auto;
+  background-color: #e7f3fe;
+  border-left: 5px solid #2196F3;
+  padding: 50px;
+  margin-bottom: 15px;
+  color: #0b3d91;
+}
+
+
+
 body {
   margin: 0;
   padding: 0;

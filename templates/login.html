@@ -10,6 +10,13 @@
   <script defer src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
 </head>
 <body>
+
+
+{% if message %}
+  <div class="custom-message">{{ message }}</div>
+{% endif %}
+
+
   <section class="login-section">
     <div class="form-card">
       <h2>🔐 Login to MedAssist</h2>
