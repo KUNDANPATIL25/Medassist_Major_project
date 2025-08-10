@@ -34,8 +34,8 @@ def register_doctor():
         specialization = request.form['specialization']
 
         if Doctor.query.filter_by(email=email).first():
-            flash("Email already registered.", "error")
-            return redirect(url_for('register_doctor'))
+           msg = "Email already registered, Please Login ."
+           return render_template('login.html', message=msg)
 
         doctor = Doctor(
             full_name=full_name,
